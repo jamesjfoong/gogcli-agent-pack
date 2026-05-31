@@ -1,113 +1,161 @@
 ---
 name: gogcli
-description: "Use gogcli to read, search, list, and download files from Google Drive; export Google Docs as markdown; and read Google Sheets. Supports multiple Google accounts via OAuth. Trigger when the user mentions Google Drive, Docs, Sheets, or Gmail from the terminal."
+description: "Use gogcli to read and edit Google Drive, Docs, Sheets, Slides, Gmail, Calendar, and more from the terminal. Supports multiple Google accounts via OAuth. Trigger when the user mentions Google Drive, Docs, Sheets, Gmail, Calendar, or Google Workspace from the terminal."
 ---
 
 # gogcli — Google Workspace CLI
 
-Access Google Drive, Docs, and Sheets from the terminal using [gogcli](https://github.com/steipete/gogcli).
+[gogcli](https://github.com/steipete/gogcli) is a comprehensive CLI for Google Workspace. It supports reading, editing, creating, deleting, and managing files across Drive, Docs, Sheets, Slides, Gmail, Calendar, Contacts, and more.
 
-## Install gogcli
+## Official Docs
+
+- Quickstart: https://gogcli.sh/quickstart.html
+- Full command reference: run `gog schema --json` or visit https://gogcli.sh
+- Agent safety profiles: https://gogcli.sh/safety.html
+
+## Install
 
 ```bash
 brew install gogcli
 # or: go install github.com/steipete/gogcli/cmd/gog@latest
 ```
 
-## One-Time Setup (Google Cloud Console)
+## One-Time Setup
 
-The user needs a Google Cloud project with APIs enabled:
+1. Create a Google Cloud project → enable APIs (Drive, Docs, Sheets, Gmail, Calendar, etc.)
+2. Configure [OAuth consent screen](https://console.cloud.google.com/auth/branding) → add test users
+3. Create [Desktop OAuth client](https://console.cloud.google.com/apis/credentials) → download JSON
+4. Store credentials: `gog auth credentials /path/to/client_secret_*.json`
+5. On Linux/WSL (D-Bus unavailable): `gog auth keyring file`
+6. Set keyring password: `export GOG_KEYRING_PASSWORD='your-password'` → add to `~/.zshrc`
+7. Authorize accounts: `gog auth add <email> --services drive,sheets,docs,gmail,calendar`
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/) → Create a new project
-2. Enable APIs: **Google Drive API**, **Google Docs API**, **Google Sheets API**
-3. Go to **APIs & Services** → **[OAuth consent screen](https://console.cloud.google.com/auth/branding)** → Set to **External** → Add your email(s) as test users
-4. Go to **APIs & Services** → **[Credentials](https://console.cloud.google.com/apis/credentials)** → **Create OAuth client ID** → **Desktop app** → Download JSON
+## Multi-Account Setup
 
-## Configure gogcli
-
-```bash
-# Store OAuth credentials (one time)
-gog auth credentials /path/to/client_secret_*.json
-
-# If on Linux/WSL/headless, switch to file keyring (avoids D-Bus issues)
-gog auth keyring file
-# Then set a keyring password:
-export GOG_KEYRING_PASSWORD='your-password-here'
-```
-
-## Add Accounts
-
-The same OAuth client works for ANY Google account. Authorize as many as needed:
+Same OAuth client authorizes any number of Google accounts. Switch between them:
 
 ```bash
-# Interactive (opens browser)
 gog auth add personal@gmail.com --services drive,sheets,docs
-
-# Headless — manual URL flow
-gog auth add personal@gmail.com --services drive,sheets,docs --manual
-
-# Remote split flow (best for AI agents)
-gog auth add personal@gmail.com --services drive,sheets,docs --remote --step 1
-# → Open the URL, authorize, paste the redirect URL back:
-gog auth add personal@gmail.com --services drive,sheets,docs --remote --step 2 --auth-url 'http://127.0.0.1:...'
+gog auth add work@company.com  --services drive,sheets,docs,gmail,calendar
+gog drive ls --account personal@gmail.com
+gog drive ls --account work@company.com
+export GOG_ACCOUNT=personal@gmail.com  # default; omit --account
 ```
 
-Repeat for each account (work, personal, etc.) — all share the same OAuth client.
-
-## Common Operations
-
-### List and Search
+## Google Drive (Read + Write)
 
 ```bash
+# Read
 gog drive ls --account <email> --max 20
-gog drive ls --all --account <email>
 gog drive search "query" --account <email>
-gog drive search "mimeType = 'application/pdf'" --raw-query --account <email>
+gog drive download <fileId> --out ./path
+
+# Write
+gog drive upload ./file.pdf --account <email>
+gog drive mkdir "New Folder" --parent <folderId>
+gog drive copy <fileId> "Copy Name"
+gog drive rename <fileId> "New Name"
+gog drive delete <fileId>              # move to trash
+gog drive delete <fileId> --permanent   # delete forever
+gog drive share <fileId> --email friend@gmail.com --role writer
+gog drive move <fileId> --parent <newFolderId>
 ```
 
-### Download
+## Google Docs (Read + Write)
 
 ```bash
-gog drive download <fileId> --account <email> --out ./path
-```
-
-### Read Google Doc as Markdown
-
-```bash
+# Read
 gog docs export <docId> --format md --out ./doc.md
+gog docs cat <docId>
+gog docs info <docId>
+
+# Create & write
+gog docs create "My New Doc"
+gog docs write <docId> --text "Hello world"
+gog docs insert <docId> "inserted text" --index 10
+gog docs edit <docId> "old text" "new text"          # find/replace
+gog docs sed <docId> 's/pattern/replacement/g'       # regex replace
+gog docs delete --start 0 --end 100 <docId>
+gog docs clear <docId>                                # wipe entire doc
+gog docs insert-table <docId> --rows 3 --cols 4
+gog docs insert-page-break <docId> --at-end
+gog docs format <docId> --bold --start 0 --end 50
+gog docs copy <docId> "Duplicate Title"
 ```
 
-### Read Google Sheet
+## Google Sheets (Read + Write)
 
 ```bash
-gog sheets get <spreadsheetId> 'Sheet1!A1:D20'
+# Read
+gog sheets get <spreadsheetId> 'Sheet1!A1:D20' --json
+
+# Create & write
+gog sheets create "My Spreadsheet"
+gog sheets update <id> 'Sheet1!A1:B2' "A" "B" "C" "D"
+gog sheets append <id> 'Sheet1!A:A' "new row value"
+gog sheets batch-update --data-json '{"A1":"hello","B1":"world"}' <id>
+gog sheets clear <id> 'Sheet1!A1:D10'
+gog sheets add-tab <id> "New Tab"
+gog sheets rename-tab <id> "Old Name" "New Name"
+gog sheets delete-tab <id> "Tab Name" --force
+gog sheets copy <id> "Duplicate Sheet"
 ```
 
-### Set Default Account
+## Gmail
 
 ```bash
-export GOG_ACCOUNT=<email>
-gog drive ls   # no --account needed
+# Read
+gog gmail search 'newer_than:7d subject:meeting'
+gog gmail get <messageId> --sanitize-content --json
+
+gog gmail send --to recipient@gmail.com --subject "Hello" --body "Message body"
+gog gmail forward <messageId> --to recipient@gmail.com
+gog gmail archive <messageId>
+gog gmail trash <messageId>
+gog gmail mark-read <messageId>
+gog gmail unread <messageId>
+gog gmail labels create "My Label"
 ```
 
-## Keyring Note
-
-If the system has an unavailable D-Bus SecretService (common on Linux/WSL), gogcli must use the **file** keyring backend:
+## Calendar
 
 ```bash
-gog auth keyring file
-export GOG_KEYRING_PASSWORD='your-password'
+gog calendar events --today
+gog calendar create --summary "Review" --from "2026-06-01T10:00:00+07:00" --to "2026-06-01T11:00:00+07:00"
 ```
 
-Add the export to `~/.zshrc` or `~/.bashrc` so it persists.
+## Safety & Agent Guardrails
 
-## Troubleshooting
+For AI agents, consider locking gogcli to prevent destructive actions:
 
-- **"Test user not added"** — Add the email at [OAuth consent screen](https://console.cloud.google.com/auth/branding)
-- **"Integrity check failed"** — `GOG_KEYRING_PASSWORD` changed between commands; use a consistent password
-- **"Refresh token expired"** — Re-run `gog auth add <email> --force-consent` (7-day expiry in Testing mode)
-- **Need more services** — Pass `--services gmail,drive,calendar,sheets,docs,contacts` etc.
+```bash
+# Block Gmail sends
+gog --gmail-no-send <command>
+
+# Only allow specific commands
+gog --enable-commands "drive.ls,drive.search,drive.download,docs.export,sheets.get" <command>
+
+# Disable destructive commands
+gog --disable-commands "drive.delete,gmail.send,admin" <command>
+```
+
+## Keyring (Critical)
+
+- **macOS**: D-Bus SecretService not needed — uses Keychain automatically
+- **Linux/WSL**: Must use file keyring: `gog auth keyring file`
+- **GOG_KEYRING_PASSWORD** must be exported before every session or added to shell profile
+- **Never change the password** after accounts are stored — it corrupts the keyring (`integrity check failed`)
+- If corrupted: re-set the correct password, then re-auth with `gog auth add <email> --force-consent`
+
+## Verification
+
+```bash
+gog auth list --check          # verify all accounts valid
+gog auth doctor --check        # diagnose issues
+gog --version                  # should show 0.20.0+
+```
 
 ## Full Reference
 
-See `{baseDir}/../AGENTS-GUIDE.md` for complete documentation.
+Official docs: https://gogcli.sh/quickstart.html
+Local reference: run `gog schema --json` for machine-readable schema of every command and flag.
