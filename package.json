@@ -1,0 +1,36 @@
+{
+  "name": "@jamesjfoong/gogcli-agent-pack",
+  "version": "1.0.0",
+  "description": "Pi skill + universal agent guide for gogcli — Google Drive/Docs/Sheets CLI with multi-account support",
+  "keywords": [
+    "pi-package",
+    "pi-skill",
+    "gogcli",
+    "google-drive",
+    "google-workspace",
+    "cli",
+    "agent"
+  ],
+  "license": "MIT",
+  "author": "jamesjfoong",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamesjfoong/gogcli-agent-pack.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jamesjfoong/gogcli-agent-pack/issues"
+  },
+  "homepage": "https://github.com/jamesjfoong/gogcli-agent-pack#readme",
+  "files": [
+    "skills/",
+    "AGENTS-GUIDE.md",
+    "install.sh",
+    "README.md"
+  ],
+  "bin": {
+    "gogcli-agent-install": "./bin/install.js"
+  },
+  "pi": {
+    "skills": ["./skills"]
+  }
+}
