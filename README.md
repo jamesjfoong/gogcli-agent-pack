@@ -1,8 +1,16 @@
 # gogcli-agent-pack
 
-**Pi skill + universal agent guide** for [gogcli](https://github.com/steipete/gogcli) — Google Drive/Docs/Sheets CLI with multi-account support.
+**Pi skill + universal agent guide** for [gogcli](https://github.com/steipete/gogcli) — Google Drive/Docs/Sheets CLI with multi-account support. Works with Pi, Claude Code, Codex, Cursor, and 50+ agents via [skills.sh](https://skills.sh).
 
 ## Install
+
+### With `npx skills` (easiest — works for 50+ agents)
+
+```bash
+npx skills add jamesjfoong/gogcli-agent-pack
+```
+
+Installs to all detected agents. Use `-g` for global, `-a pi` for a specific agent.
 
 ### Via Pi
 
@@ -14,12 +22,6 @@ pi install git:github.com/jamesjfoong/gogcli-agent-pack
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jamesjfoong/gogcli-agent-pack/main/install.sh | bash
-```
-
-### Via npx (npm)
-
-```bash
-npx @jamesjfoong/gogcli-agent-pack
 ```
 
 ### Manual
