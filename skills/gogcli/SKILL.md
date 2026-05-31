@@ -155,7 +155,87 @@ gog auth doctor --check        # diagnose issues
 gog --version                  # should show 0.20.0+
 ```
 
-## Full Reference
+## Tips & Tricks
 
-Official docs: https://gogcli.sh/quickstart.html
-Local reference: run `gog schema --json` for machine-readable schema of every command and flag.
+### `--json` for scripting (all commands)
+
+```bash
+# Stable JSON envelope — pipes clean into scripts/LLMs
+gog drive ls --json --max 5
+gog sheets get <id> 'Sheet1!A1:D20' --json
+```
+
+### `--results-only` + `--select` for clean LLM output
+
+```bash
+# Drop envelope, get only results
+gog drive ls --json --results-only --max 3
+
+# Pick specific fields
+gog drive ls --json --select "id,name,mimeType" --max 10
+gog sheets get <id> 'Sheet1!A1:C5' --json --results-only
+```
+
+### `--plain` for TSV (pipe to awk)
+
+```bash
+gog drive ls --plain | awk '$2 == "folder" {print $1}'  # list folder IDs
+```
+
+### Gmail: `--sanitize-content` strips HTML/URLs for agents
+
+```bash
+gog gmail get <messageId> --sanitize-content --json
+```
+
+### Offline URL generation
+
+```bash
+# No API call needed — works offline
+gog open <driveFileId>           # → https://drive.google.com/open?id=...
+gog open <docId> --type docs     # → https://docs.google.com/...
+gog open <threadId> --type gmail-thread
+```
+
+### Drive tree view
+
+```bash
+gog drive tree --parent <folderId> --depth 3 --account <email>
+gog drive du --parent <folderId> --json       # disk usage per folder
+gog drive inventory --account <email> > backup.csv
+```
+
+### Audit sharing permissions
+
+```bash
+# Find publicly shared files
+gog drive audit sharing --account <email>
+# Find all files shared with a specific person
+gog drive audit user friend@gmail.com
+```
+
+### `--dry-run` before mutating
+
+```bash
+gog drive delete <id> --dry-run              # preview what would happen
+gog drive share <id> --email x@y.com --dry-run
+gog docs clear <id> --dry-run                # "Would delete 1,234 chars"
+```
+
+### `--no-input` for CI/scripts
+
+```bash
+gog drive delete <id> --no-input -y          # fail instead of prompt
+gog docs write <id> --text "hi" --no-input   # never interact
+```
+
+### Quick access (short aliases)
+
+```bash
+gog ls                               # = gog drive ls
+gog search "query"                   # = gog drive search
+gog dl <id>                          # = gog drive download
+gog up ./file.pdf                    # = gog drive upload
+gog cat <docId>                      # = gog docs cat
+gog me                               # = gog people me (profile)
+```
