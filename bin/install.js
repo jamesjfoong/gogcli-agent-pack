@@ -14,7 +14,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PKG_ROOT = path.resolve(__dirname, '..');
-const GUIDE_PATH = path.join(PKG_ROOT, 'AGENTS-GUIDE.md');
+const GUIDE_PATH = path.join(PKG_ROOT, 'AGENTS.md');
 const SKILL_SRC = path.join(PKG_ROOT, 'skills', 'gogcli', 'SKILL.md');
 
 const AGENTS = [
@@ -66,7 +66,7 @@ function log(icon, label, msg) {
 
 function install(dryRun) {
   if (!fs.existsSync(GUIDE_PATH)) {
-    console.error('❌ AGENTS-GUIDE.md not found. Are you running from the package root?');
+    console.error('❌ AGENTS.md not found. Are you running from the package root?');
     process.exit(1);
   }
 

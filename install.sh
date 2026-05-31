@@ -19,11 +19,11 @@ fi
 
 cd "$TMP_DIR"
 
-GUIDE="$TMP_DIR/AGENTS-GUIDE.md"
+GUIDE="$TMP_DIR/AGENTS.md"
 SKILL_SRC="$TMP_DIR/skills/gogcli/SKILL.md"
 
 if [ ! -f "$GUIDE" ]; then
-  echo "❌ AGENTS-GUIDE.md not found. Corrupt clone?"
+  echo "❌ AGENTS.md not found. Corrupt clone?"
   exit 1
 fi
 
