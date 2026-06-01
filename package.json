@@ -1,7 +1,7 @@
 {
-  "name": "gogcli-agent-pack",
+  "name": "gogcli-agent-skillset",
   "version": "1.0.0",
-  "description": "Google Drive CLI (gogcli) skill and agent instructions for Pi, Claude, Cursor, Copilot, and more",
+  "description": "Google Workspace gog/gogcli skills and agent instructions for Pi, Claude, Cursor, Copilot, and more",
   "keywords": ["pi-package", "gogcli", "google-drive", "google-workspace", "cli"],
   "license": "MIT",
   "pi": {

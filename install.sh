@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# gogcli-agent-pack installer
+# gogcli-agent-skillset installer
 # Wires gogcli instructions into all supported agents
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -15,10 +15,10 @@ fi
 echo "🔌 Installing gogcli agent instructions..."
 
 # --- Pi ---
-PI_SKILL_DIR="$HOME/.pi/agent/skills/gogcli"
-mkdir -p "$PI_SKILL_DIR"
-cp "$REPO_DIR/skills/gogcli/SKILL.md" "$PI_SKILL_DIR/SKILL.md"
-echo "  ✅ Pi skill → $PI_SKILL_DIR"
+PI_SKILL_DIR_GOG="$HOME/.pi/agent/skills/gog"
+mkdir -p "$PI_SKILL_DIR_GOG"
+cp "$REPO_DIR/skills/gog/SKILL.md" "$PI_SKILL_DIR_GOG/SKILL.md"
+echo "  ✅ Pi skill → $PI_SKILL_DIR_GOG"
 
 # --- Claude Desktop ---
 mkdir -p "$HOME/.claude"

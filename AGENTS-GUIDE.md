@@ -62,3 +62,19 @@ echo 'export GOG_KEYRING_PASSWORD="gogcli-local-dev-key"' >> ~/.zshrc
 - `GOG_KEYRING_PASSWORD` must be exported before each session or set in shell profile
 - OAuth app is in **Testing** mode — refresh tokens expire after 7 days. Re-auth with `gog auth add <email> --force-consent` if needed
 - Test users must be added in [GCP OAuth Consent Screen](https://console.cloud.google.com/auth/branding)
+
+## Google Sheets Smart-Chip Links
+
+`gog sheets get` may return chip label text without URL.
+
+Use raw payload:
+
+```bash
+gog sheets raw <spreadsheetId> --include-grid-data --json --account <email>
+```
+
+Extract links in this order:
+
+1. `chipRuns[].chip.richLinkProperties.uri`
+2. `hyperlink`
+3. `textFormatRuns[].format.link.uri`
